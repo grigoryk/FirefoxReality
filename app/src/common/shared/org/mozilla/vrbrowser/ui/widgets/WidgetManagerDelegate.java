@@ -29,6 +29,8 @@ public interface WidgetManagerDelegate {
     void removeWidget(@NonNull Widget aWidget);
     void startWidgetResize(@NonNull Widget aWidget);
     void finishWidgetResize(@NonNull Widget aWidget);
+    void startWidgetMove(@NonNull Widget aWidget);
+    void finishWidgetMove();
     void addUpdateListener(@NonNull UpdateListener aUpdateListener);
     void removeUpdateListener(@NonNull UpdateListener aUpdateListener);
     void pushBackHandler(@NonNull Runnable aRunnable);

@@ -15,6 +15,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.CursorAnchorInfo;
@@ -87,6 +88,7 @@ public class KeyboardWidget extends UIWidget implements CustomKeyboardView.OnKey
     private int mKeyWidth;
     private int mKeyboardPopupTopMargin;
     private ImageButton mCloseKeyboardButton;
+    private ImageButton mKeyboardMoveButton;
     private boolean mIsLongPress;
     private boolean mIsMultiTap;
     private boolean mIsCapsLock;
@@ -177,6 +179,15 @@ public class KeyboardWidget extends UIWidget implements CustomKeyboardView.OnKey
         mCapsLockOnIcon = getResources().getDrawable(R.drawable.ic_icon_keyboard_caps, getContext().getTheme());
         mCloseKeyboardButton = findViewById(R.id.keyboardCloseButton);
         mCloseKeyboardButton.setOnClickListener(v -> dismiss());
+        mKeyboardMoveButton = findViewById(R.id.keyboardMoveButton);
+        mKeyboardMoveButton.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                mWidgetManager.startWidgetMove(KeyboardWidget.this);
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                mWidgetManager.finishWidgetMove();
+            }
+            return false;
+        });
 
         mKeyWidth = getResources().getDimensionPixelSize(R.dimen.keyboard_key_width);
         mKeyboardPopupTopMargin  = getResources().getDimensionPixelSize(R.dimen.keyboard_key_pressed_padding) * 2;
