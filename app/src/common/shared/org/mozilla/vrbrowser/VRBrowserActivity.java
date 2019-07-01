@@ -390,6 +390,7 @@ public class VRBrowserActivity extends PlatformActivity implements WidgetManager
     public void createWindow() {
         // Remove previous Window
         if (mWindowWidget != null) {
+            // Update bookmarks
             mBookmarksView.removeListeners(new BookmarkListener[]{mWindowWidget});
 
             // Detach widgets from the previous Window
@@ -397,7 +398,6 @@ public class VRBrowserActivity extends PlatformActivity implements WidgetManager
             mNavigationBar.detachFromWindow(mWindowWidget);
             mTopBar.detachFromWindow(mWindowWidget);
             mKeyboard.detachFromWindow(mWindowWidget);
-            mTray.detachFromWindow(mWindowWidget);
 
             // Hide previous window
             removeWidget(mWindowWidget);
@@ -411,8 +411,8 @@ public class VRBrowserActivity extends PlatformActivity implements WidgetManager
 
         } else {
             // Add new window and set it as the active one
-            int newWindowId = mWindows.size();
-            mWindowWidget = new WindowWidget(this, newWindowId);
+            mActiveWindowId = mWindows.size();
+            mWindowWidget = new WindowWidget(this, mActiveWindowId);
             mWindowWidget.setBookmarksView(mBookmarksView);
             mWindowWidget.setActiveWindow();
             mWindowWidget.getSessionStore().loadUri(SettingsStore.getInstance(this).getHomepage());
@@ -422,7 +422,7 @@ public class VRBrowserActivity extends PlatformActivity implements WidgetManager
         // Show the new Window
         addWidget(mWindowWidget);
 
-        // Attach current active window to widgets
+        // Update permissions and bookmarks
         mPermissionDelegate.setParentWidgetHandle(mWindowWidget.getHandle());
         mBookmarksView.addListeners(new BookmarkListener[]{mWindowWidget});
 
@@ -455,8 +455,7 @@ public class VRBrowserActivity extends PlatformActivity implements WidgetManager
             boolean enabled = extras.getBoolean("e10s", wasEnabled);
             if (wasEnabled != enabled) {
                 SettingsStore.getInstance(this).setMultiprocessEnabled(enabled);
-                if (activeStore != null)
-                    activeStore.setMultiprocess(enabled);
+                SessionManager.get().setMultiprocess(enabled);
             }
         }
 
