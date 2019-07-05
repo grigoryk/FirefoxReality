@@ -18,22 +18,22 @@
             <org.mozilla.vrbrowser.ui.views.UIButton
                 android:id="@+id/privateButton"
                 style="@style/trayButtonMiddleTheme"
-                android:src="@drawable/ic_icon_private_browsing"/>
+                android:src="@drawable/ic_icon_tray_private_browsing_v2"/>
 
             <org.mozilla.vrbrowser.ui.views.UIButton
                 android:id="@+id/addwindowButton"
                 style="@style/trayButtonMiddleTheme"
-                android:src="@drawable/ic_icon_tray_add_window"/>
+                android:src="@drawable/ic_icon_tray_newwindow"/>
 
             <org.mozilla.vrbrowser.ui.views.UIButton
                 android:id="@+id/bookmarksButton"
                 style="@style/trayButtonMiddleTheme"
-                android:src="@drawable/ic_icon_bookmarks"/>
+                android:src="@drawable/ic_icon_tray_bookmarks_v2"/>
 
             <org.mozilla.vrbrowser.ui.views.UIButton
                 android:id="@+id/settingsButton"
                 style="@style/trayButtonEndTheme"
-                android:src="@drawable/ic_icon_settings"/>
+                android:src="@drawable/ic_icon_tray_settings_v2"/>
         </LinearLayout>
 
     </RelativeLayout>
