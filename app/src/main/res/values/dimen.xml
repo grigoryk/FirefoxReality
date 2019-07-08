@@ -194,4 +194,8 @@
     <!-- Blur -->
     <dimen name="blur_radius">2dp</dimen>
     <dimen name="blur_radius_half">1dp</dimen>
+
+    <!-- Max windows prompt -->
+    <dimen name="max_windows_prompt_width">320dp</dimen>
+    <dimen name="max_windows_prompt_height">260dp</dimen>
 </resources>
