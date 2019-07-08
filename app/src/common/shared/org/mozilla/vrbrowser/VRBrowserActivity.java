@@ -977,8 +977,8 @@ public class VRBrowserActivity extends PlatformActivity implements WidgetManager
     }
 
     @Override
-    public void startWidgetResize(final Widget aWidget, float anchorX) {
-        queueRunnable(() -> startWidgetResizeNative(aWidget.getHandle(), anchorX));
+    public void startWidgetResize(final Widget aWidget) {
+        queueRunnable(() -> startWidgetResizeNative(aWidget.getHandle()));
     }
 
     @Override
@@ -1196,7 +1196,7 @@ public class VRBrowserActivity extends PlatformActivity implements WidgetManager
     private native void updateWidgetNative(int aHandle, WidgetPlacement aPlacement);
     private native void updateVisibleWidgetsNative();
     private native void removeWidgetNative(int aHandle);
-    private native void startWidgetResizeNative(int aHandle, float anchorX);
+    private native void startWidgetResizeNative(int aHandle);
     private native void finishWidgetResizeNative(int aHandle);
     private native void setWorldBrightnessNative(float aBrigthness);
     private native void setTemporaryFilePath(String aPath);
