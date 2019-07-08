@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -78,6 +79,7 @@ public class NavigationBarWidget extends UIWidget implements GeckoSession.Naviga
     private UIButton mProjectionButton;
     private UITextButton mPreset0;
     private UITextButton mPreset1;
+    private UITextButton mPreset15;
     private UITextButton mPreset2;
     private UITextButton mPreset3;
     private ArrayList<CustomUIButton> mButtons;
@@ -191,6 +193,7 @@ public class NavigationBarWidget extends UIWidget implements GeckoSession.Naviga
         mResizeExitButton = findViewById(R.id.resizeExitButton);
         mPreset0 = findViewById(R.id.resizePreset0);
         mPreset1 = findViewById(R.id.resizePreset1);
+        mPreset15 = findViewById(R.id.resizePreset15);
         mPreset2 = findViewById(R.id.resizePreset2);
         mPreset3 = findViewById(R.id.resizePreset3);
 
@@ -270,6 +273,14 @@ public class NavigationBarWidget extends UIWidget implements GeckoSession.Naviga
         mPreset1.setOnClickListener(view -> {
             view.requestFocusFromTouch();
             setResizePreset(1.0f);
+            if (mAudio != null) {
+                mAudio.playSound(AudioEngine.Sound.CLICK);
+            }
+        });
+
+        mPreset15.setOnClickListener(view -> {
+            view.requestFocusFromTouch();
+            setResizePreset(1.5f);
             if (mAudio != null) {
                 mAudio.playSound(AudioEngine.Sound.CLICK);
             }
@@ -491,6 +502,14 @@ public class NavigationBarWidget extends UIWidget implements GeckoSession.Naviga
         mWidgetManager.pushBackHandler(mResizeBackHandler);
         mWidgetManager.setTrayVisible(false);
         closeFloatingMenus();
+
+        float maxScale = 3.0f;
+        if (mAttachedWindow != null) {
+            maxScale = mAttachedWindow.getMaxWindowScale();
+        }
+        mPreset3.setEnabled(maxScale >= 3.0f);
+        mPreset2.setEnabled(maxScale >= 2.0f);
+        mPreset15.setVisibility(maxScale == 1.5f ? View.VISIBLE: View.GONE);
     }
 
     private void exitResizeMode(boolean aCommitChanges) {
@@ -961,7 +980,8 @@ public class NavigationBarWidget extends UIWidget implements GeckoSession.Naviga
 
     private void startWidgetResize() {
         if (mAttachedWindow != null) {
-            mWidgetManager.startWidgetResize(mAttachedWindow);
+            Pair<Float, Float> targetSize = mAttachedWindow.getSizeForScale(mAttachedWindow.getMaxWindowScale());
+            mWidgetManager.startWidgetResize(mAttachedWindow, targetSize.first, 4.5f);
         }
     }
 
