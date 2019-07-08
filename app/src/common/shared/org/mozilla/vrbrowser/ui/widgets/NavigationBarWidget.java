@@ -364,6 +364,9 @@ public class NavigationBarWidget extends UIWidget implements GeckoSession.Naviga
         if (mIsResizing) {
             exitResizeMode(false);
         }
+        if (mIsInFullScreenMode) {
+            exitFullScreenMode();
+        }
         if (mURLBar.isInBookmarkMode() && mAttachedWindow != null) {
             onBookmarksHidden(mAttachedWindow);
         }
