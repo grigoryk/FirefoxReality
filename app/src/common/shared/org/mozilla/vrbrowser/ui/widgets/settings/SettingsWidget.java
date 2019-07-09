@@ -8,14 +8,16 @@ package org.mozilla.vrbrowser.ui.widgets.settings;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -24,9 +26,8 @@ import org.mozilla.vrbrowser.BuildConfig;
 import org.mozilla.vrbrowser.R;
 import org.mozilla.vrbrowser.audio.AudioEngine;
 import org.mozilla.vrbrowser.browser.SessionStore;
-import org.mozilla.vrbrowser.browser.SettingsStore;
 import org.mozilla.vrbrowser.ui.views.HoneycombButton;
-import org.mozilla.vrbrowser.ui.views.HoneycombSwitch;
+import org.mozilla.vrbrowser.ui.views.UIButton;
 import org.mozilla.vrbrowser.ui.widgets.UIWidget;
 import org.mozilla.vrbrowser.ui.widgets.WidgetManagerDelegate;
 import org.mozilla.vrbrowser.ui.widgets.WidgetPlacement;
@@ -45,7 +46,7 @@ public class SettingsWidget extends UIDialog implements WidgetManagerDelegate.Wo
     private AudioEngine mAudio;
     private SettingsView mCurrentView;
     private TextView mBuildText;
-    private LinearLayout mMainLayout;
+    private ViewGroup mMainLayout;
     private int mViewMarginH;
     private int mViewMarginV;
     private int mRestartDialogHandle = -1;
@@ -86,13 +87,18 @@ public class SettingsWidget extends UIDialog implements WidgetManagerDelegate.Wo
         mWidgetManager.addWorldClickListener(this);
         mMainLayout = findViewById(R.id.optionsLayout);
 
-        ImageButton cancelButton = findViewById(R.id.settingsCancelButton);
-
+        UIButton cancelButton = findViewById(R.id.backButton);
         cancelButton.setOnClickListener(v -> {
             if (mAudio != null) {
                 mAudio.playSound(AudioEngine.Sound.CLICK);
             }
 
+            onDismiss();
+        });
+
+        LinearLayout reportIssue = findViewById(R.id.reportIssueLayout);
+        reportIssue.setOnClickListener(v -> {
+            SessionStore.get().loadUri(getContext().getString(R.string.bug_report_url));
             onDismiss();
         });
 
@@ -112,26 +118,6 @@ public class SettingsWidget extends UIDialog implements WidgetManagerDelegate.Wo
             }
 
             onSettingsPrivacyClick();
-        });
-
-        HoneycombSwitch crashSwitch = findViewById(R.id.crashReportingSwitch);
-        crashSwitch.setChecked(SettingsStore.getInstance(getContext()).isCrashReportingEnabled());
-        crashSwitch.setOnCheckedChangeListener((compoundButton, b) -> {
-            if (mAudio != null) {
-                mAudio.playSound(AudioEngine.Sound.CLICK);
-            }
-
-            onSettingsCrashReportingChange(b);
-        });
-
-        HoneycombSwitch telemetrySwitch = findViewById(R.id.telemetry_switch);
-        telemetrySwitch.setChecked(SettingsStore.getInstance(getContext()).isTelemetryEnabled());
-        telemetrySwitch.setOnCheckedChangeListener((compoundButton, b) -> {
-            if (mAudio != null) {
-                mAudio.playSound(AudioEngine.Sound.CLICK);
-            }
-
-            onSettingsTelemetryChange(b);
         });
 
         HoneycombButton displayButton = findViewById(R.id.displayButton);
@@ -173,7 +159,7 @@ public class SettingsWidget extends UIDialog implements WidgetManagerDelegate.Wo
             return view.performClick();
         });
 
-        HoneycombButton reportButton = findViewById(R.id.reportButton);
+        HoneycombButton reportButton = findViewById(R.id.helpButton);
         reportButton.setOnClickListener(view -> {
             if (mAudio != null) {
                 mAudio.playSound(AudioEngine.Sound.CLICK);
@@ -226,15 +212,6 @@ public class SettingsWidget extends UIDialog implements WidgetManagerDelegate.Wo
         aPlacement.anchorY = 0.5f;
         aPlacement.translationY = WidgetPlacement.unitFromMeters(getContext(), R.dimen.settings_world_y);
         aPlacement.translationZ = WidgetPlacement.unitFromMeters(getContext(), R.dimen.settings_world_z);
-    }
-
-    private void onSettingsCrashReportingChange(boolean isEnabled) {
-        SettingsStore.getInstance(getContext()).setCrashReportingEnabled(isEnabled);
-    }
-
-    private void onSettingsTelemetryChange(boolean isEnabled) {
-        SettingsStore.getInstance(getContext()).setTelemetryEnabled(isEnabled);
-        // TODO: Waiting for Telemetry to be merged
     }
 
     private void onSettingsPrivacyClick() {
@@ -327,9 +304,15 @@ public class SettingsWidget extends UIDialog implements WidgetManagerDelegate.Wo
         }
         mCurrentView = aView;
         if (mCurrentView != null) {
+            Point viewDimensions = mCurrentView.getDimensions();
+            mViewMarginH = mWidgetPlacement.width - viewDimensions.x;
+            mViewMarginH = WidgetPlacement.convertDpToPixel(getContext(), mViewMarginH);
+            mViewMarginV = mWidgetPlacement.height - viewDimensions.y;
+            mViewMarginV = WidgetPlacement.convertDpToPixel(getContext(), mViewMarginV);
+
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             params.leftMargin = params.rightMargin = mViewMarginH / 2;
-            params.topMargin = params.bottomMargin = mViewMarginH / 2;
+            params.topMargin = params.bottomMargin = mViewMarginV / 2;
             this.addView(mCurrentView, params);
             mCurrentView.setDelegate(this);
             mCurrentView.onShown();
@@ -393,7 +376,8 @@ public class SettingsWidget extends UIDialog implements WidgetManagerDelegate.Wo
     @Override
     public void onDismiss() {
         if (mCurrentView != null) {
-            showView(null);
+            if (!mCurrentView.isEditing())
+                showView(null);
         } else {
             super.onDismiss();
         }

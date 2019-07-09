@@ -11,13 +11,8 @@
             android:orientation="horizontal">
 
             <org.mozilla.vrbrowser.ui.views.UIButton
-                android:id="@+id/helpButton"
-                style="@style/trayButtonStartTheme"
-                android:src="@drawable/ic_icon_tray_help_v2"/>
-
-            <org.mozilla.vrbrowser.ui.views.UIButton
                 android:id="@+id/privateButton"
-                style="@style/trayButtonMiddleTheme"
+                style="@style/trayButtonStartTheme"
                 android:src="@drawable/ic_icon_private_browsing"/>
 
             <org.mozilla.vrbrowser.ui.views.UIButton

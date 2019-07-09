@@ -35,6 +35,7 @@ class VoiceSearchLanguageOptionsView extends SettingsView {
 
         mAudio = AudioEngine.fromContext(aContext);
 
+        mScrollbar = findViewById(R.id.scrollbar);
 
         mBackButton = findViewById(R.id.backButton);
         mBackButton.setOnClickListener(view -> {
@@ -54,12 +55,6 @@ class VoiceSearchLanguageOptionsView extends SettingsView {
         mResetButton.setOnClickListener(mResetListener);
 
         mScrollbar = findViewById(R.id.scrollbar);
-    }
-
-    @Override
-    public void onShown() {
-        super.onShown();
-        mScrollbar.scrollTo(0, 0);
     }
 
     private RadioGroupSetting.OnCheckedChangeListener mLanguageListener = (radioGroup, checkedId, doApply) -> {

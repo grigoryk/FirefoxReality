@@ -61,8 +61,8 @@
     <!-- Settings Dialog -->
     <item name="settings_world_y" format="float" type="dimen">1.6</item>
     <item name="settings_world_z" format="float" type="dimen">-2.0</item>
-    <dimen name="settings_width">730dp</dimen>
-    <dimen name="settings_height">520dp</dimen>
+    <dimen name="settings_width">770dp</dimen>
+    <dimen name="settings_height">490dp</dimen>
     <dimen name="settings_button_height">320dp</dimen>
     <dimen name="settings_button_text_width">100dp</dimen>
     <dimen name="settings_main_button_text_width">125dp</dimen>
@@ -187,4 +187,12 @@
     <!-- Blur -->
     <dimen name="blur_radius">2dp</dimen>
     <dimen name="blur_radius_half">1dp</dimen>
+
+    <!-- Dialog buttons -->
+    <dimen name="report_issue_width">145dp</dimen>
+    <dimen name="report_issue_height">65dp</dimen>
+
+    <!-- Privacy settings -->
+    <dimen name="privacy_options_width">585dp</dimen>
+    <dimen name="privacy_options_height">490dp</dimen>
 </resources>

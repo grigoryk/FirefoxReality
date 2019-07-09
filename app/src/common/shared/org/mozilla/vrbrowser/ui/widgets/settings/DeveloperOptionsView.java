@@ -7,7 +7,6 @@ package org.mozilla.vrbrowser.ui.widgets.settings;
 
 import android.content.Context;
 import android.view.View;
-import android.widget.ScrollView;
 
 import org.mozilla.vrbrowser.R;
 import org.mozilla.vrbrowser.audio.AudioEngine;
@@ -15,7 +14,6 @@ import org.mozilla.vrbrowser.browser.SessionStore;
 import org.mozilla.vrbrowser.browser.SettingsStore;
 import org.mozilla.vrbrowser.ui.views.UIButton;
 import org.mozilla.vrbrowser.ui.views.settings.ButtonSetting;
-import org.mozilla.vrbrowser.ui.views.settings.SingleEditSetting;
 import org.mozilla.vrbrowser.ui.views.settings.SwitchSetting;
 import org.mozilla.vrbrowser.ui.widgets.WidgetManagerDelegate;
 
@@ -28,10 +26,7 @@ class DeveloperOptionsView extends SettingsView {
     private SwitchSetting mConsoleLogsSwitch;
     private SwitchSetting mMultiprocessSwitch;
     private SwitchSetting mServoSwitch;
-    private SingleEditSetting mHomepageEdit;
-    private String mDefaultHomepageUrl;
     private ButtonSetting mResetButton;
-    private ScrollView mScrollbar;
 
     public DeveloperOptionsView(Context aContext, WidgetManagerDelegate aWidgetManager) {
         super(aContext, aWidgetManager);
@@ -51,15 +46,6 @@ class DeveloperOptionsView extends SettingsView {
 
             onDismiss();
         });
-
-        mDefaultHomepageUrl = getContext().getString(R.string.homepage_url);
-
-        mHomepageEdit = findViewById(R.id.homepage_edit);
-        mHomepageEdit.setHint1(getContext().getString(R.string.homepage_hint, getContext().getString(R.string.app_name)));
-        mHomepageEdit.setDefaultFirstValue(mDefaultHomepageUrl);
-        mHomepageEdit.setFirstText(SettingsStore.getInstance(getContext()).getHomepage());
-        mHomepageEdit.setOnClickListener(mHomepageListener);
-        setHomepage(SettingsStore.getInstance(getContext()).getHomepage());
 
         mRemoteDebuggingSwitch = findViewById(R.id.remote_debugging_switch);
         mRemoteDebuggingSwitch.setOnCheckedChangeListener(mRemoteDebuggingListener);
@@ -86,37 +72,6 @@ class DeveloperOptionsView extends SettingsView {
 
         mScrollbar = findViewById(R.id.scrollbar);
     }
-
-    @Override
-    public void onShown() {
-        super.onShown();
-        mScrollbar.scrollTo(0, 0);
-    }
-
-    @Override
-    public void onHidden() {
-        super.onHidden();
-        mHomepageEdit.cancel();
-    }
-
-    @Override
-    protected void onDismiss() {
-        if (mHomepageEdit.isEditing()) {
-            mHomepageEdit.cancel();
-
-        } else {
-            super.onDismiss();
-        }
-    }
-
-    private OnClickListener mHomepageListener = (view) -> {
-        if (!mHomepageEdit.getFirstText().isEmpty()) {
-            setHomepage(mHomepageEdit.getFirstText());
-
-        } else {
-            setHomepage(mDefaultHomepageUrl);
-        }
-    };
 
     private SwitchSetting.OnCheckedChangeListener mRemoteDebuggingListener = (compoundButton, value, doApply) -> {
         setRemoteDebugging(value, doApply);
@@ -150,19 +105,11 @@ class DeveloperOptionsView extends SettingsView {
         if (mServoSwitch.isChecked() != SettingsStore.SERVO_DEFAULT) {
             setServo(SettingsStore.SERVO_DEFAULT, true);
         }
-        setHomepage(mDefaultHomepageUrl);
 
         if (restart && mDelegate != null) {
             showRestartDialog();
         }
     };
-
-    private void setHomepage(String newHomepage) {
-        mHomepageEdit.setOnClickListener(null);
-        mHomepageEdit.setFirstText(newHomepage);
-        SettingsStore.getInstance(getContext()).setHomepage(newHomepage);
-        mHomepageEdit.setOnClickListener(mHomepageListener);
-    }
 
     private void setRemoteDebugging(boolean value, boolean doApply) {
         mRemoteDebuggingSwitch.setOnCheckedChangeListener(null);
@@ -209,15 +156,6 @@ class DeveloperOptionsView extends SettingsView {
 
         if (doApply) {
             SessionStore.get().setServo(value);
-        }
-    }
-
-    @Override
-    public void onGlobalFocusChanged(View oldFocus, View newFocus) {
-        if (oldFocus != null) {
-            if (mHomepageEdit.contains(oldFocus) && mHomepageEdit.isEditing()) {
-                mHomepageEdit.cancel();
-            }
         }
     }
 

@@ -7,6 +7,7 @@ package org.mozilla.vrbrowser.ui.widgets.settings;
 
 import android.Manifest;
 import android.content.Context;
+import android.graphics.Point;
 import android.util.Pair;
 import android.view.View;
 import android.widget.ScrollView;
@@ -22,18 +23,21 @@ import org.mozilla.vrbrowser.ui.views.UIButton;
 import org.mozilla.vrbrowser.ui.views.settings.ButtonSetting;
 import org.mozilla.vrbrowser.ui.views.settings.SwitchSetting;
 import org.mozilla.vrbrowser.ui.widgets.WidgetManagerDelegate;
+import org.mozilla.vrbrowser.ui.widgets.WidgetPlacement;
 
 import java.util.ArrayList;
 
 class PrivacyOptionsView extends SettingsView {
     private AudioEngine mAudio;
     private UIButton mBackButton;
+    private SwitchSetting mDrmContentPlaybackSwitch;
     private SwitchSetting mTrackingSetting;
-    private SwitchSetting mAutoplaySetting;
+    private SwitchSetting mNotificationsPermissionSwitch;
     private ButtonSetting mResetButton;
-    private ArrayList<Pair<ButtonSetting, String>> mPermissionButtons;
-    private int mAlertDialogHandle;
-    private ScrollView mScrollbar;
+    private ArrayList<Pair<SwitchSetting, String>> mPermissionButtons;
+    private SwitchSetting mSpeechDataSwitch;
+    private SwitchSetting mTelemetryDataSwitch;
+    private SwitchSetting mCrashreportsDataSwitch;
 
     public PrivacyOptionsView(Context aContext, WidgetManagerDelegate aWidgetManager) {
         super(aContext, aWidgetManager);
@@ -69,66 +73,77 @@ class PrivacyOptionsView extends SettingsView {
             exitWholeSettings();
         });
 
-        mTrackingSetting = findViewById(R.id.trackingProtectionButton);
+        mDrmContentPlaybackSwitch = findViewById(R.id.drmContentPlaybackSwitch);
+        mDrmContentPlaybackSwitch.setChecked(SettingsStore.getInstance(getContext()).isDrmContentPlaybackEnabled());
+        mDrmContentPlaybackSwitch.setOnCheckedChangeListener((compoundButton, enabled, apply) -> {
+            SettingsStore.getInstance(getContext()).setDrmContentPlaybackEnabled(enabled);
+            // TODO Enable/Disable DRM content playback
+        });
+        mDrmContentPlaybackSwitch.setLinkClickListner((widget, url) -> {
+            SessionStore.get().loadUri(url);
+            exitWholeSettings();
+        });
+
+        mTrackingSetting = findViewById(R.id.trackingProtectionSwitch);
         mTrackingSetting.setChecked(SettingsStore.getInstance(getContext()).isTrackingProtectionEnabled());
         mTrackingSetting.setOnCheckedChangeListener((compoundButton, enabled, apply) -> {
             SettingsStore.getInstance(getContext()).setTrackingProtectionEnabled(enabled);
             SessionStore.get().setTrackingProtection(enabled);
         });
 
-        mAutoplaySetting = findViewById(R.id.autoplaySwitch);
-        mAutoplaySetting.setChecked(SessionStore.get().getAutoplayEnabled());
-        mAutoplaySetting.setOnCheckedChangeListener((compoundButton, enabled, apply) -> {
-            SessionStore.get().setAutoplayEnabled(enabled);
-        });
-
         TextView permissionsTitleText = findViewById(R.id.permissionsTitle);
         permissionsTitleText.setText(getContext().getString(R.string.security_options_permissions_title, getContext().getString(R.string.app_name)));
 
         mPermissionButtons = new ArrayList<>();
-        mPermissionButtons.add(Pair.create(findViewById(R.id.cameraPermissionButton), Manifest.permission.CAMERA));
-        mPermissionButtons.add(Pair.create(findViewById(R.id.microphonePermissionButton), Manifest.permission.RECORD_AUDIO));
-        mPermissionButtons.add(Pair.create(findViewById(R.id.locationPermissionButton), Manifest.permission.ACCESS_FINE_LOCATION));
-        mPermissionButtons.add(Pair.create(findViewById(R.id.storagePermissionButton), Manifest.permission.READ_EXTERNAL_STORAGE));
+        mPermissionButtons.add(Pair.create(findViewById(R.id.cameraPermissionSwitch), Manifest.permission.CAMERA));
+        mPermissionButtons.add(Pair.create(findViewById(R.id.microphonePermissionSwitch), Manifest.permission.RECORD_AUDIO));
+        mPermissionButtons.add(Pair.create(findViewById(R.id.locationPermissionSwitch), Manifest.permission.ACCESS_FINE_LOCATION));
+        mPermissionButtons.add(Pair.create(findViewById(R.id.storagePermissionSwitch), Manifest.permission.READ_EXTERNAL_STORAGE));
 
         if (BuildConfig.FLAVOR_platform == "oculusvr3dof" || BuildConfig.FLAVOR_platform == "oculusvr")
-            findViewById(R.id.cameraPermissionButton).setVisibility(View.GONE);
+            findViewById(R.id.cameraPermissionSwitch).setVisibility(View.GONE);
 
-        for (Pair<ButtonSetting, String> button: mPermissionButtons) {
-            if (mWidgetManager.isPermissionGranted(button.second)) {
-                button.first.setShowAsLabel(true);
-                button.first.setButtonText(getContext().getString(R.string.permission_enabled));
-            }
-            button.first.setOnClickListener(v -> {
-                togglePermission(button.first, button.second);
-            });
+        for (Pair<SwitchSetting, String> button: mPermissionButtons) {
+            button.first.setChecked(mWidgetManager.isPermissionGranted(button.second));
+            button.first.setOnCheckedChangeListener((compoundButton, enabled, apply) ->
+                    togglePermission(button.first, button.second));
         }
 
+        mNotificationsPermissionSwitch = findViewById(R.id.notificationsPermissionSwitch);
+        mNotificationsPermissionSwitch.setChecked(SettingsStore.getInstance(getContext()).isNotificationsEnabled());
+        mNotificationsPermissionSwitch.setOnCheckedChangeListener((compoundButton, enabled, apply) -> {
+            SettingsStore.getInstance(getContext()).setNotificationsEnabled(enabled);
+        });
+
+        mSpeechDataSwitch = findViewById(R.id.speechDataSwitch);
+        mSpeechDataSwitch.setChecked(SettingsStore.getInstance(getContext()).isSpeechDataCollectionEnabled());
+        mSpeechDataSwitch.setOnCheckedChangeListener((compoundButton, enabled, apply) ->
+                SettingsStore.getInstance(getContext()).setSpeechDataCollectionEnabled(enabled));
+
+        mTelemetryDataSwitch = findViewById(R.id.telemetryDataSwitch);
+        mTelemetryDataSwitch.setChecked(SettingsStore.getInstance(getContext()).isTelemetryEnabled());
+        mTelemetryDataSwitch.setOnCheckedChangeListener((compoundButton, enabled, apply) ->
+                SettingsStore.getInstance(getContext()).setTelemetryEnabled(enabled));
+
+        mCrashreportsDataSwitch = findViewById(R.id.crashReportsDataSwitch);
+        mCrashreportsDataSwitch.setChecked(SettingsStore.getInstance(getContext()).isCrashReportingEnabled());
+        mCrashreportsDataSwitch.setOnCheckedChangeListener((compoundButton, enabled, apply) ->
+                SettingsStore.getInstance(getContext()).setCrashReportingEnabled(enabled));
 
         mResetButton = findViewById(R.id.resetButton);
         mResetButton.setOnClickListener(v -> resetOptions());
     }
 
-    @Override
-    public void onShown() {
-        super.onShown();
-        mScrollbar.scrollTo(0, 0);
-    }
-
-    @Override
-    public void onHidden() {
-        super.onHidden();
-    }
-
-    private void togglePermission(ButtonSetting aButton, String aPermission) {
+    private void togglePermission(SwitchSetting aButton, String aPermission) {
         if (mWidgetManager.isPermissionGranted(aPermission)) {
             showAlert(aButton.getDescription(), getContext().getString(R.string.security_options_permissions_reject_message));
+            aButton.setChecked(true);
+
         } else {
             mWidgetManager.requestPermission("", aPermission, new GeckoSession.PermissionDelegate.Callback() {
                 @Override
                 public void grant() {
-                    aButton.setShowAsLabel(true);
-                    aButton.setButtonText(getContext().getString(R.string.permission_enabled));
+                    aButton.setChecked(true);
                 }
                 @Override
                 public void reject() {
@@ -142,5 +157,11 @@ class PrivacyOptionsView extends SettingsView {
         if (mTrackingSetting.isChecked() != SettingsStore.TRACKING_DEFAULT) {
             mTrackingSetting.setChecked(SettingsStore.TRACKING_DEFAULT);
         }
+    }
+
+    @Override
+    public Point getDimensions() {
+        return new Point( WidgetPlacement.dpDimension(getContext(), R.dimen.privacy_options_width),
+                WidgetPlacement.dpDimension(getContext(), R.dimen.privacy_options_height));
     }
 }
