@@ -6,6 +6,7 @@
 package org.mozilla.vrbrowser.ui.widgets.settings;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.view.View;
 
 import org.mozilla.vrbrowser.BuildConfig;
@@ -20,6 +21,7 @@ import org.mozilla.vrbrowser.ui.views.settings.RadioGroupSetting;
 import org.mozilla.vrbrowser.ui.views.settings.SingleEditSetting;
 import org.mozilla.vrbrowser.ui.views.settings.SwitchSetting;
 import org.mozilla.vrbrowser.ui.widgets.WidgetManagerDelegate;
+import org.mozilla.vrbrowser.ui.widgets.WidgetPlacement;
 
 class DisplayOptionsView extends SettingsView {
     private AudioEngine mAudio;
@@ -487,6 +489,12 @@ class DisplayOptionsView extends SettingsView {
                 mHomepageEdit.cancel();
             }
         }
+    }
+
+    @Override
+    public Point getDimensions() {
+        return new Point( WidgetPlacement.dpDimension(getContext(), R.dimen.display_options_width),
+                WidgetPlacement.dpDimension(getContext(), R.dimen.display_options_height));
     }
 
 }

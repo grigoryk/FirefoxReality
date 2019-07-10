@@ -6,6 +6,7 @@
 package org.mozilla.vrbrowser.ui.widgets.settings;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.view.View;
 import android.widget.ScrollView;
 
@@ -16,6 +17,7 @@ import org.mozilla.vrbrowser.ui.views.UIButton;
 import org.mozilla.vrbrowser.ui.views.settings.ButtonSetting;
 import org.mozilla.vrbrowser.ui.views.settings.RadioGroupSetting;
 import org.mozilla.vrbrowser.ui.widgets.WidgetManagerDelegate;
+import org.mozilla.vrbrowser.ui.widgets.WidgetPlacement;
 import org.mozilla.vrbrowser.utils.LocaleUtils;
 
 class VoiceSearchLanguageOptionsView extends SettingsView {
@@ -74,5 +76,11 @@ class VoiceSearchLanguageOptionsView extends SettingsView {
         mLanguage.setOnCheckedChangeListener(mLanguageListener);
 
         SettingsStore.getInstance(getContext()).setVoiceSearchLanguage(mLanguage.getValueForId(checkedId).toString());
+    }
+
+    @Override
+    public Point getDimensions() {
+        return new Point( WidgetPlacement.dpDimension(getContext(), R.dimen.language_options_width),
+                WidgetPlacement.dpDimension(getContext(), R.dimen.language_options_height));
     }
 }

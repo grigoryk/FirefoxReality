@@ -20,7 +20,7 @@
             android:layout_marginStart="40dp"
             android:layout_marginTop="50dp"
             android:src="@drawable/ic_icon_back"
-            android:tint="@color/midnight"
+            android:tint="@color/fog_void_tint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 

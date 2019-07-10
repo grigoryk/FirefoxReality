@@ -195,4 +195,12 @@
     <!-- Privacy settings -->
     <dimen name="privacy_options_width">585dp</dimen>
     <dimen name="privacy_options_height">490dp</dimen>
+
+    <!-- Privacy settings -->
+    <dimen name="language_options_width">585dp</dimen>
+    <dimen name="language_options_height">490dp</dimen>
+
+    <!-- Display settings -->
+    <dimen name="display_options_width">585dp</dimen>
+    <dimen name="display_options_height">420dp</dimen>
 </resources>
