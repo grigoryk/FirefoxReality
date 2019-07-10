@@ -6,11 +6,13 @@
 package org.mozilla.vrbrowser.ui.widgets.settings;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.graphics.Point;
+import android.os.Bundle;
 import android.util.Pair;
 import android.view.View;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.mozilla.geckoview.GeckoSession;
@@ -47,6 +49,8 @@ class PrivacyOptionsView extends SettingsView {
     private void initialize(Context aContext) {
         inflate(aContext, R.layout.options_privacy, this);
         mAudio = AudioEngine.fromContext(aContext);
+
+        ((Application)aContext.getApplicationContext()).registerActivityLifecycleCallbacks(mLifeCycleListener);
 
         mBackButton = findViewById(R.id.backButton);
         mBackButton.setOnClickListener(view -> {
@@ -164,4 +168,52 @@ class PrivacyOptionsView extends SettingsView {
         return new Point( WidgetPlacement.dpDimension(getContext(), R.dimen.privacy_options_width),
                 WidgetPlacement.dpDimension(getContext(), R.dimen.privacy_options_height));
     }
+
+    @Override
+    public void releasePointerCapture() {
+        super.releasePointerCapture();
+        ((Application)getContext().getApplicationContext()).unregisterActivityLifecycleCallbacks(mLifeCycleListener);
+    }
+
+    private Application.ActivityLifecycleCallbacks mLifeCycleListener = new Application.ActivityLifecycleCallbacks() {
+
+        @Override
+        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+
+        }
+
+        @Override
+        public void onActivityStarted(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityResumed(Activity activity) {
+            // Refresh permission settings status after a permission has been requested
+            for (Pair<SwitchSetting, String> button: mPermissionButtons) {
+                button.first.setValue(mWidgetManager.isPermissionGranted(button.second), false);
+            }
+        }
+
+        @Override
+        public void onActivityPaused(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivityStopped(Activity activity) {
+
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+        }
+
+        @Override
+        public void onActivityDestroyed(Activity activity) {
+
+        }
+    };
+
 }
