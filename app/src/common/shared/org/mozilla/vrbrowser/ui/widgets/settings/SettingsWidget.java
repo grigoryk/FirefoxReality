@@ -8,7 +8,6 @@ package org.mozilla.vrbrowser.ui.widgets.settings;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -16,8 +15,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -27,7 +26,6 @@ import org.mozilla.vrbrowser.R;
 import org.mozilla.vrbrowser.audio.AudioEngine;
 import org.mozilla.vrbrowser.browser.SessionStore;
 import org.mozilla.vrbrowser.ui.views.HoneycombButton;
-import org.mozilla.vrbrowser.ui.views.UIButton;
 import org.mozilla.vrbrowser.ui.widgets.UIWidget;
 import org.mozilla.vrbrowser.ui.widgets.WidgetManagerDelegate;
 import org.mozilla.vrbrowser.ui.widgets.WidgetPlacement;
@@ -87,7 +85,7 @@ public class SettingsWidget extends UIDialog implements WidgetManagerDelegate.Wo
         mWidgetManager.addWorldClickListener(this);
         mMainLayout = findViewById(R.id.optionsLayout);
 
-        UIButton cancelButton = findViewById(R.id.backButton);
+        ImageButton cancelButton = findViewById(R.id.backButton);
         cancelButton.setOnClickListener(v -> {
             if (mAudio != null) {
                 mAudio.playSound(AudioEngine.Sound.CLICK);
